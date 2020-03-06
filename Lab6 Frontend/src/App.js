@@ -1,84 +1,93 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Button, Input } from 'reactstrap';
-const api = 'http://localhost:8000/api/students'
+const api = 'http://localhost:8000/api/students/'
 
 const App = () => {
-  const [students, setStudents] = useState({})
-  const [bear, setBear] = useState('')
-  const [id, setID] = useState('')
-  const [name, setName] = useState('')
-  const [surname, setSurname] = useState('')
-  const [major, setMajor] = useState('')
-  const [GPA, setGPA] = useState(0)
+  const [students, setStudents] = useState([])
+  const [student, setStudent] = useState({
+    id: '',
+    name: '',
+    surname: '',
+    major: '',
+    GPA: 0
+  })
+
 
   const getStudents = async () => {
     const result = await axios.get(`${api}`)
     setStudents(result.data)
   }
 
-  // const getBear = async (id) => {
-  //   const result = await axios.get(`${api}${id}`)
-  //   setBear(result.data)
-  // }
+  const getStudent = async (id) => {
+    const result = await axios.get(`${api}${id}`)
+    setStudent(result.data)
+    console.log(student)
+  }
 
-  // const addBear = async (name, weight) => {
-  //   const result = await axios.post(`${api}`, {
-  //     name,
-  //     weight
-  //   })
-  //   console.log(result.data)
-  //   getBears()
-  // }
+  const addStudent = async () => {
+    const result = await axios.post(`${api}`, student)
+    console.log(result.data)
+    getStudents()
+  }
 
-  // const deleteBear = async (id) => {
-  //   const result = await axios.delete(`${api}${id}`)
-  //   console.log(result.data)
-  //   getBears()
-  // }
+  const deleteStudent = async (id) => {
+    const result = await axios.delete(`${api}${id}`)
+    console.log(result.data)
+    getStudents()
+  }
 
-  // const updateBear = async (id) => {
-  //   const result = await axios.put(`${api}${id}`, {
-  //     name,
-  //     weight
-  //   })
-  //   console.log('bear id update: ', result.data)
-  //   getBears()
-  // }
+  const updateStudent = async (id) => {
+    const result = await axios.put(`${api}${id}`, student)
+    console.log('student id update: ', result.data)
+    getStudents()
+  }
 
 
-  const printBears = () => {
-    console.log('Students:', Students)
-    if (Students && Students.length)
-      return (Students.map((Student, index) =>
-        (<li key={index}>
-          {Student.id} - {Student.name} - {Student.surname} - {Student.Major} 
-          {/* <Button style={{ marginLeft: 10 }} onClick = {() => deleteBear(bear.id)}> Delete </Button>
-          <Button style={{ marginLeft: 10 }} onClick = {() => getBear(bear.id)}>Get</Button>
-          <Button style={{ marginLeft: 10 }} onClick = {() => updateBear(bear.id)}>Update</Button> */}
-        </li>)
-      ))
+  const printStudents = () => {
+    if (students && students.length)
+      return (
+        <div>{
+          (students.map((student, index) =>
+            (<div key={index}>
+              <ul>STUDENT : {index + 1}</ul>
+              <ul>ID: {student.id}</ul>
+              <ul>NAME: {student.name}</ul>
+              <ul>SURNAME: {student.surname}</ul>
+              <ul>MAJOR: {student.Major}</ul>
+              <ul>GPA: {student.GPA}</ul>
+
+              <Button style={{ marginLeft: 10 }} onClick={() => deleteStudent(index.id)}> Delete </Button>
+              <Button style={{ marginLeft: 10 }} onClick={() => getStudent(student.id)}>Get</Button>
+              <Button style={{ marginLeft: 10 }} onClick={() => updateStudent(student.id)}>Update</Button>
+            </div>)
+          ))}
+        </div>
+      )
     else {
-      return (<h2>No bears</h2>)
+      return (<h2>No students</h2>)
     }
   }
 
 
   useEffect(() => {
-    getBears()
+    getStudents()
   }, [])
 
 
   return (
     <div >
-      <h2>Bears</h2>
-      <ul>{printBears()}</ul>
+      <h2>Students</h2>
+      <ul>{printStudents()}</ul>
 
-      selected bear: {bear.name} {bear.weight}
-      <h2>Add bear</h2>
-      Name:<Input type="text" style={{ width: '20%' }} onChange={(e) => setName(e.target.value)} /> <br />
-      Weight:<Input type="number" style={{ width: '20%' }} onChange={(e) => setWeight(e.target.value)} /> <br />
-      <Button onClick={() => addBear(name, weight)}>Add new bear</Button>
+
+      <h2>Add student</h2>
+      ID:<Input type="text" style={{ width: '20%' }} value={student.id} onChange={(e) => setStudent({ ...student, id: e.target.value })} />  <br />
+      Name:<Input type="text" style={{ width: '20%' }} value={student.name} onChange={(e) => setStudent({ ...student, name: e.target.value })} /> <br />
+      Surname:<Input type="text" style={{ width: '20%' }} value={student.surname} onChange={(e) => setStudent({ ...student, surname: e.target.value })} /> <br />
+      Major:<Input type="text" style={{ width: '20%' }} value={student.Major} onChange={(e) => setStudent({ ...student, Major: e.target.value })} /> <br />
+      GPA:<Input type="text" style={{ width: '20%' }} value={student.GPA} onChange={(e) => setStudent({ ...student, GPA: e.target.value })} /> <br />
+      <Button onClick={() => addStudent()}>Add new student</Button>
     </div>
   )
 }
